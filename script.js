@@ -8,6 +8,28 @@ const showEverything = () => {
   revealItems.forEach((item) => item.classList.add("is-visible"));
 };
 
+const splitHeroTitle = () => {
+  const title = document.querySelector(".hero-copy h1");
+
+  if (!title || title.dataset.split === "true") return [];
+
+  const text = title.textContent.trim();
+  title.dataset.split = "true";
+  title.classList.add("hero-title");
+  title.setAttribute("aria-label", text);
+  title.textContent = "";
+
+  Array.from(text).forEach((character) => {
+    const span = document.createElement("span");
+    span.className = character === " " ? "title-char title-space" : "title-char";
+    span.setAttribute("aria-hidden", "true");
+    span.textContent = character === " " ? "\u00A0" : character;
+    title.appendChild(span);
+  });
+
+  return title.querySelectorAll(".title-char");
+};
+
 const runFallbackReveal = () => {
   if (!("IntersectionObserver" in window)) {
     showEverything();
@@ -36,6 +58,7 @@ const runGsapReveal = () => {
   gsap.registerPlugin(ScrollTrigger);
   document.documentElement.classList.add("gsap-ready");
   showEverything();
+  const titleChars = splitHeroTitle();
 
   gsap.from(".brand, .nav", {
     y: -18,
@@ -45,13 +68,38 @@ const runGsapReveal = () => {
     stagger: 0.12,
   });
 
-  gsap.from(".hero-copy > *", {
-    y: isMobileViewport ? 28 : 42,
-    opacity: 0,
-    duration: 0.9,
-    ease: "power3.out",
-    stagger: 0.11,
-  });
+  const heroTimeline = gsap.timeline({ delay: 0.14 });
+
+  heroTimeline
+    .from(".hero-copy .eyebrow", {
+      y: 18,
+      opacity: 0,
+      duration: 0.5,
+      ease: "power3.out",
+    })
+    .from(
+      titleChars,
+      {
+        y: isMobileViewport ? 18 : 26,
+        opacity: 0,
+        filter: "blur(8px)",
+        duration: 0.16,
+        ease: "power2.out",
+        stagger: isMobileViewport ? 0.035 : 0.045,
+      },
+      "-=0.1"
+    )
+    .from(
+      ".hero-text, .hero-actions",
+      {
+        y: isMobileViewport ? 24 : 34,
+        opacity: 0,
+        duration: 0.72,
+        ease: "power3.out",
+        stagger: 0.1,
+      },
+      "-=0.05"
+    );
 
   gsap.from(".hero-panel", {
     y: isMobileViewport ? 30 : 54,
