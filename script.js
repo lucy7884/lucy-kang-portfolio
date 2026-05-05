@@ -1,11 +1,19 @@
 const revealItems = document.querySelectorAll(".section-reveal");
 const isMobileViewport = window.matchMedia("(max-width: 700px)").matches;
+const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 document.documentElement.classList.add("js-ready");
 
-if (!("IntersectionObserver" in window)) {
+const showEverything = () => {
   revealItems.forEach((item) => item.classList.add("is-visible"));
-} else {
+};
+
+const runFallbackReveal = () => {
+  if (!("IntersectionObserver" in window)) {
+    showEverything();
+    return;
+  }
+
   const revealObserver = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
@@ -21,7 +29,97 @@ if (!("IntersectionObserver" in window)) {
     }
   );
 
-  revealItems.forEach((item) => {
-    revealObserver.observe(item);
+  revealItems.forEach((item) => revealObserver.observe(item));
+};
+
+const runGsapReveal = () => {
+  gsap.registerPlugin(ScrollTrigger);
+  document.documentElement.classList.add("gsap-ready");
+  showEverything();
+
+  gsap.from(".brand, .nav", {
+    y: -18,
+    opacity: 0,
+    duration: 0.7,
+    ease: "power3.out",
+    stagger: 0.12,
   });
+
+  gsap.from(".hero-copy > *", {
+    y: isMobileViewport ? 28 : 42,
+    opacity: 0,
+    duration: 0.9,
+    ease: "power3.out",
+    stagger: 0.11,
+  });
+
+  gsap.from(".hero-panel", {
+    y: isMobileViewport ? 30 : 54,
+    scale: isMobileViewport ? 0.97 : 0.94,
+    opacity: 0,
+    duration: 1.05,
+    ease: "power3.out",
+    delay: 0.18,
+  });
+
+  gsap.utils.toArray(".section-reveal:not(.hero)").forEach((section) => {
+    const headingItems = section.querySelectorAll(".section-label, .section-heading > *, .contact > .eyebrow, .contact > h2, .contact > p");
+    const contentItems = section.querySelectorAll(".about-grid article, .project-card, .skill-cloud span, .process-track div, .contact-links a");
+
+    gsap.from(headingItems, {
+      scrollTrigger: {
+        trigger: section,
+        start: isMobileViewport ? "top 86%" : "top 78%",
+        once: true,
+      },
+      y: isMobileViewport ? 26 : 36,
+      opacity: 0,
+      duration: 0.72,
+      ease: "power3.out",
+      stagger: 0.08,
+    });
+
+    gsap.from(contentItems, {
+      scrollTrigger: {
+        trigger: section,
+        start: isMobileViewport ? "top 78%" : "top 70%",
+        once: true,
+      },
+      y: isMobileViewport ? 34 : 46,
+      scale: isMobileViewport ? 0.98 : 0.965,
+      opacity: 0,
+      duration: 0.76,
+      ease: "power3.out",
+      stagger: isMobileViewport ? 0.06 : 0.1,
+    });
+  });
+
+  gsap.utils.toArray(".project-card").forEach((card) => {
+    const image = card.querySelector(".project-visual img");
+
+    if (!image) return;
+
+    gsap.fromTo(
+      image,
+      { scale: 1.08 },
+      {
+        scale: 1.01,
+        ease: "none",
+        scrollTrigger: {
+          trigger: card,
+          start: "top bottom",
+          end: "bottom top",
+          scrub: 0.7,
+        },
+      }
+    );
+  });
+};
+
+if (prefersReducedMotion) {
+  showEverything();
+} else if (window.gsap && window.ScrollTrigger) {
+  runGsapReveal();
+} else {
+  runFallbackReveal();
 }

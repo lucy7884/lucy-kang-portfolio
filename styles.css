@@ -509,6 +509,13 @@ h3 {
   animation: rise 0.72s ease both;
 }
 
+.gsap-ready .section-reveal.is-visible .about-grid article,
+.gsap-ready .section-reveal.is-visible .project-card,
+.gsap-ready .section-reveal.is-visible .skill-cloud span,
+.gsap-ready .section-reveal.is-visible .process-track div {
+  animation: none;
+}
+
 .section-reveal.is-visible .about-grid article:nth-child(2),
 .section-reveal.is-visible .project-card:nth-child(2),
 .section-reveal.is-visible .skill-cloud span:nth-child(2n),
