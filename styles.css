@@ -490,13 +490,14 @@ h3 {
   font-weight: 700;
 }
 
-.section-reveal {
+.js-ready .section-reveal {
   opacity: 0;
   transform: translateY(34px);
-  transition: opacity 0.8s ease, transform 0.8s ease;
+  transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
 }
 
-.section-reveal.is-visible {
+.js-ready .section-reveal.is-visible {
   opacity: 1;
   transform: translateY(0);
 }
@@ -547,6 +548,7 @@ h3 {
     transition-duration: 0.01ms !important;
   }
 
+  .js-ready .section-reveal,
   .section-reveal {
     opacity: 1;
     transform: none;
@@ -610,6 +612,22 @@ h3 {
 
   h2 {
     font-size: 32px;
+  }
+
+  .js-ready .section-reveal {
+    transform: translateY(46px) scale(0.985);
+    transition-duration: 0.72s;
+  }
+
+  .js-ready .section-reveal.is-visible {
+    transform: translateY(0) scale(1);
+  }
+
+  .section-reveal.is-visible .about-grid article,
+  .section-reveal.is-visible .project-card,
+  .section-reveal.is-visible .skill-cloud span,
+  .section-reveal.is-visible .process-track div {
+    animation-duration: 0.62s;
   }
 
   .hero-actions,
